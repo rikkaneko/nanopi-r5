@@ -32,7 +32,7 @@ main() {
         exit 0
     fi
 
-    check_installed 'debootstrap' 'wget' 'xz' 'mkfs.xfs' 'rsync'
+    check_installed 'debootstrap' 'wget' 'xz' 'mkfs.xfs' 'rsync' 'unzip'
 
     if [ -f "$media" ]; then
         read -p "file $media exists, overwrite? <y/N> " yn
@@ -61,15 +61,22 @@ main() {
     local lfwsha='c029551b45a15926c9d7a5df1a0b540044064f19157c57fc11d91fd0aade837f'
     [ "$lfwsha" = $(sha256sum "$lfw" | cut -c1-64) ] || { echo -e "invalid hash for $lfw"; exit 5; }
 
-    # u-boot
-    local uboot_spl=$(download "$cache" 'https://github.com/inindev/nanopi-r5/releases/download/v12.0.3/idbloader-r5s.img')
-    [ -f "$uboot_spl" ] || { echo -e "unable to fetch $uboot_spl"; exit 4; }
-    local uboot_itb=$(download "$cache" 'https://github.com/inindev/nanopi-r5/releases/download/v12.0.3/u-boot-r5s.itb')
-    [ -f "$uboot_itb" ] || { echo -e "unable to fetch: $uboot_itb"; exit 4; }
+    # # u-boot
+    # local uboot_spl=$(download "$cache" 'https://github.com/inindev/nanopi-r5/releases/download/v12.0.3/idbloader-r5s.img')
+    # [ -f "$uboot_spl" ] || { echo -e "unable to fetch $uboot_spl"; exit 4; }
+    # local uboot_itb=$(download "$cache" 'https://github.com/inindev/nanopi-r5/releases/download/v12.0.3/u-boot-r5s.itb')
+    # [ -f "$uboot_itb" ] || { echo -e "unable to fetch: $uboot_itb"; exit 4; }
 
     # dtb
     local dtb=$(download "$cache" "https://github.com/inindev/nanopi-r5/releases/download/v12.0.3/rk3568-nanopi-r5s.dtb")
     [ -f "$dtb" ] || { echo -e "unable to fetch $dtb"; exit 4; }
+
+    local uboot=$(download "$cache" "https://github.com/inindev/u-boot-build/releases/download/2025.01/rk3568-nanopi-r5s.zip")
+    local ubootsha='64960cd6c8da4b4c0240fa8ab8ff07c66a97a72f9e692ca3bcc9d66a44ef67cd'
+    [ "$ubootsha" = $(sha256sum "$uboot" | cut -c1-64) ] || { echo -e "invalid hash for $uboot"; exit 5; }
+    print_hdr "extracting $uboot"
+    unzip "$uboot"
+
 
     # setup media
     if [ ! -b "$media" ]; then
@@ -197,8 +204,9 @@ main() {
     rm -rf "$mountpt"
 
     print_hdr "installing u-boot"
-    dd bs=4K seek=8 if="$uboot_spl" of="$media" conv=notrunc
-    dd bs=4K seek=2048 if="$uboot_itb" of="$media" conv=notrunc,fsync
+    # dd bs=4K seek=8 if="$uboot_spl" of="$media" conv=notrunc
+    # dd bs=4K seek=2048 if="$uboot_itb" of="$media" conv=notrunc,fsync
+    dd if="$cache/rk3568-nanopi-r5s/u-boot-rockchip.bin" of="$media" bs=32k seek=1 conv=notrunc,fsync
 
     if $compress; then
         print_hdr "compressing image file"
