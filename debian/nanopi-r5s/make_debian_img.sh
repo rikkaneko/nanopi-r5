@@ -75,7 +75,7 @@ main() {
     local ubootsha='64960cd6c8da4b4c0240fa8ab8ff07c66a97a72f9e692ca3bcc9d66a44ef67cd'
     [ "$ubootsha" = $(sha256sum "$uboot" | cut -c1-64) ] || { echo -e "invalid hash for $uboot"; exit 5; }
     print_hdr "extracting $uboot"
-    unzip "$uboot"
+    unzip "$uboot" -d "$cache"
 
 
     # setup media
@@ -206,7 +206,7 @@ main() {
     print_hdr "installing u-boot"
     # dd bs=4K seek=8 if="$uboot_spl" of="$media" conv=notrunc
     # dd bs=4K seek=2048 if="$uboot_itb" of="$media" conv=notrunc,fsync
-    dd if="$cache/rk3568-nanopi-r5s/u-boot-rockchip.bin" of="$media" bs=32k seek=1 conv=notrunc,fsync
+    dd if="$cache/u-boot-rockchip.bin" of="$media" bs=32k seek=1 conv=notrunc,fsync
 
     if $compress; then
         print_hdr "compressing image file"
