@@ -166,7 +166,7 @@ main() {
     sed -i "s/127.0.0.1\tlocalhost/127.0.0.1\tlocalhost\n127.0.1.1\t$hostname/" "$mountpt/etc/hosts"
 
     print_hdr "creating user account"
-    chroot "$mountpt" /usr/sbin/useradd -m "$acct_uid" -s '/bin/bash' -U
+    chroot "$mountpt" /usr/sbin/useradd -m "$acct_uid" -s '/bin/bash' -U -u 1000 -g 1000
     chroot "$mountpt" /bin/sh -c "/usr/bin/echo -e $acct_uid:$acct_pass | /usr/sbin/chpasswd -c YESCRYPT"
     chroot "$mountpt" /usr/bin/passwd -e "$acct_uid"
     (umask 377 && echo -e "$acct_uid ALL=(ALL) NOPASSWD: ALL" > "$mountpt/etc/sudoers.d/$acct_uid")
@@ -181,10 +181,10 @@ main() {
     if [ -n "$ssh_key" ]; then
         print_hdr "found ssh key $ssh_key"
         mkdir "$mountpt/home/$acct_uid/.ssh"
-        chown "$acct_uid":"$acct_uid" "$mountpt/home/$acct_uid/.ssh"
         chmod 700 "$mountpt/home/$acct_uid/.ssh"
         echo "$ssh_key" > "$mountpt/home/$acct_uid/.ssh/authorized_keys"
         chmod 600 "$mountpt/home/$acct_uid/.ssh/authorized_keys"
+        chown -R 1000:1000 "$mountpt/home/$acct_uid/.ssh"
     fi
 
     # generate machine id on first boot
