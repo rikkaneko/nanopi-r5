@@ -166,7 +166,7 @@ main() {
     sed -i "s/127.0.0.1\tlocalhost/127.0.0.1\tlocalhost\n127.0.1.1\t$hostname/" "$mountpt/etc/hosts"
 
     print_hdr "creating user account"
-    chroot "$mountpt" /usr/sbin/useradd -m "$acct_uid" -s '/bin/bash' -U -u 1000 -g 1000
+    chroot "$mountpt" /usr/sbin/useradd -m "$acct_uid" -s '/bin/bash' -U
     chroot "$mountpt" /bin/sh -c "/usr/bin/echo -e $acct_uid:$acct_pass | /usr/sbin/chpasswd -c YESCRYPT"
     chroot "$mountpt" /usr/bin/passwd -e "$acct_uid"
     (umask 377 && echo -e "$acct_uid ALL=(ALL) NOPASSWD: ALL" > "$mountpt/etc/sudoers.d/$acct_uid")
