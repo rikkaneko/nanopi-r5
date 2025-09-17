@@ -32,7 +32,7 @@ main() {
         exit 0
     fi
 
-    check_installed 'debootstrap' 'wget' 'xz' 'mkfs.xfs'
+    check_installed 'debootstrap' 'wget' 'xz' 'mkfs.xfs' 'rsync'
 
     if [ -f "$media" ]; then
         read -p "file $media exists, overwrite? <y/N> " yn
@@ -180,11 +180,11 @@ main() {
     rm -fv "$mountpt/etc/ssh/ssh_host_"*
     if [ -n "$ssh_key" ]; then
         print_hdr "found ssh key $ssh_key"
-        mkdir "/home/$acct_uid/.ssh"
-        chown "$acct_uid":"$acct_uid" "/home/$acct_uid/.ssh"
-        chmod 700 "/home/$acct_uid/.ssh"
-        echo "$ssh_key" > "/home/$acct_uid/.ssh/authorized_keys"
-        chmod 600 "/home/$acct_uid/.ssh/authorized_keys"
+        mkdir "$mountpt/home/$acct_uid/.ssh"
+        chown "$acct_uid":"$acct_uid" "$mountpt/home/$acct_uid/.ssh"
+        chmod 700 "$mountpt/home/$acct_uid/.ssh"
+        echo "$ssh_key" > "$mountpt/home/$acct_uid/.ssh/authorized_keys"
+        chmod 600 "$mountpt/home/$acct_uid/.ssh/authorized_keys"
     fi
 
     # generate machine id on first boot
