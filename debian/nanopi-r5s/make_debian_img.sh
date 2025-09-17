@@ -43,7 +43,7 @@ main() {
     fi
 
     # no compression if disabled or block media
-    local compress=$(is_param 'nocomp' "$@" || [ -b "$media" ] && echo -e false || echo -e true)
+    local compress=$(is_param 'nocomp' "$@" || [ -b "$media" ] || [ $PI_NOCOMP == "1" ] && echo -e false || echo -e true)
 
     if $compress && [ -f "$media.xz" ]; then
         read -p "file $media.xz exists, overwrite? <y/N> " yn
@@ -210,7 +210,7 @@ main() {
 
     if $compress; then
         print_hdr "compressing image file"
-        xz -z8v "$media"
+        xz -zvT "$media"
         echo -e "\n${cya}compressed image is now ready${rst}"
         echo -e "\n${cya}copy image to target media:${rst}"
         echo -e "  ${cya}sudo sh -c 'xzcat $media.xz > /dev/sdX && sync'${rst}"
