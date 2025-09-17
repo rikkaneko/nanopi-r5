@@ -141,7 +141,7 @@ main() {
     else
         print_hdr "found built debian root at $debian_root."
     fi
-    rsync -aAXH "$debian_root" "$mountpt"
+    rsync -aAXH "$debian_root/" "$mountpt"
 
     # apt sources & default locale
     echo -e "$(file_apt_sources $deb_dist)\n" > "$mountpt/etc/apt/sources.list"
@@ -182,9 +182,9 @@ main() {
         print_hdr "found ssh key $ssh_key"
         mkdir "/home/$acct_uid/.ssh"
         chown "$acct_uid":"$acct_uid" "/home/$acct_uid/.ssh"
-        chmod 770 "/home/$acct_uid/.ssh"
+        chmod 700 "/home/$acct_uid/.ssh"
         echo "$ssh_key" > "/home/$acct_uid/.ssh/authorized_keys"
-        chmod 660 "/home/$acct_uid/.ssh/authorized_keys"
+        chmod 600 "/home/$acct_uid/.ssh/authorized_keys"
     fi
 
     # generate machine id on first boot
